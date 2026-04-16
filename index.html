@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plus Production - طلب التقديم</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: #0d1b2a;
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .landing {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            background: rgba(13, 27, 42, 0.85);
+        }
+
+        .landing.hidden {
+            display: none;
+        }
+
+        .logo-wrapper {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .brand {
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #1b3a5f 0%, #2d5a87 50%, #4a7fb0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 60px rgba(45, 90, 135, 0.8);
+            margin-bottom: 0.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 0.3em;
+            margin-bottom: 1rem;
+        }
+
+        .company {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.5);
+            padding: 0.5rem 1.5rem;
+            border: 1px solid rgba(45, 90, 135, 0.4);
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 3rem;
+        }
+
+        .enter-btn {
+            padding: 1.2rem 3.5rem;
+            font-size: 1.3rem;
+            font-weight: 700;
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #1b3a5f 0%, #2d5a87 100%);
+            border: 2px solid rgba(45, 90, 135, 0.5);
+            color: white;
+            border-radius: 50px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .enter-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 40px rgba(45, 90, 135, 0.8);
+        }
+
+        .enter-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .form-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            background: rgba(13, 27, 42, 0.9);
+        }
+
+        .form-container.active {
+            display: flex;
+        }
+
+        .form-box {
+            background: rgba(20, 35, 55, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(45, 90, 135, 0.5);
+            border-radius: 20px;
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 0 40px rgba(45, 90, 135, 0.3);
+        }
+
+        .form-title {
+            font-size: 1.3rem;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 1.2rem;
+            background: linear-gradient(135deg, #1b3a5f 0%, #4a7fb0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .form-group {
+            margin-bottom: 0.8rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+            font-family: 'Cairo', sans-serif;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(45, 90, 135, 0.4);
+            border-radius: 10px;
+            color: white;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: #2d5a87;
+            box-shadow: 0 0 20px rgba(45, 90, 135, 0.4);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 0.8rem;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #1b3a5f 0%, #2d5a87 100%);
+            border: none;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-top: 0.8rem;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(45, 90, 135, 0.5);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .success-message.active {
+            display: block;
+        }
+
+        .success-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1b3a5f 0%, #2d5a87 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(45, 90, 135, 0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(45, 90, 135, 0); }
+        }
+
+        .success-message h2 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #4a7fb0;
+        }
+
+        .success-message p {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.5;
+            font-size: 0.9rem;
+        }
+
+        .back-btn {
+            margin-top: 1rem;
+            padding: 0.6rem 1.5rem;
+            font-size: 0.85rem;
+            font-family: 'Cairo', sans-serif;
+            background: transparent;
+            border: 2px solid rgba(45, 90, 135, 0.6);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(45, 90, 135, 0.3);
+        }
+
+        .already-submitted {
+            display: none;
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .already-submitted.active {
+            display: block;
+        }
+
+        .already-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .already-submitted h2 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #e74c3c;
+        }
+
+        .already-submitted p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .form-box.shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(45, 90, 135, 0.3);
+            border-top-color: #2d5a87;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 0.8rem;
+        }
+
+        .loading p {
+            font-size: 0.9rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .brand {
+                font-size: 2.5rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+                letter-spacing: 0.1em;
+            }
+
+            .company {
+                font-size: 1rem;
+            }
+
+            .enter-btn {
+                padding: 1rem 2.5rem;
+                font-size: 1.2rem;
+            }
+
+            .form-box {
+                padding: 2rem 1.5rem;
+                border-radius: 20px;
+            }
+
+            .form-title {
+                font-size: 1.5rem;
+            }
+
+            .form-group {
+                margin-bottom: 1.2rem;
+            }
+
+            .form-group label {
+                font-size: 0.9rem;
+            }
+
+            .form-group input {
+                padding: 0.8rem 1rem;
+                font-size: 0.95rem;
+            }
+
+            .submit-btn {
+                padding: 1rem;
+                font-size: 1rem;
+            }
+
+            .success-message {
+                padding: 2rem 1rem;
+            }
+
+            .success-message h2 {
+                font-size: 1.5rem;
+            }
+
+            .success-message p {
+                font-size: 0.95rem;
+            }
+
+            .success-icon {
+                width: 80px;
+                height: 80px;
+                font-size: 2.5rem;
+            }
+
+            .back-btn {
+                padding: 0.7rem 1.5rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .brand {
+                font-size: 2rem;
+            }
+
+            .form-box {
+                padding: 1.5rem 1rem;
+            }
+
+            .form-title {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+
+    <div class="landing" id="landing">
+        <div class="logo-wrapper">
+            <h1 class="brand">صنع في زين</h1>
+            <p class="subtitle">Plus Production</p>
+            <span class="company">Plus Stage</span>
+        </div>
+        <button class="enter-btn" onclick="showForm()">تقديم تمثيل</button>
+    </div>
+
+    <div class="form-container" id="formContainer">
+        <div class="form-box" id="formBox">
+            <div id="formContent">
+                <h2 class="form-title">تقديم تمثيل مسرحية صنع في زين</h2>
+                <form id="applicationForm">
+                    <div class="form-group">
+                        <label>الاسم</label>
+                        <input type="text" id="name" placeholder="اكتب اسمك هنا" required>
+                        <p class="error-message" id="nameError">الرجاء ادخال الاسم</p>
+                    </div>
+                    <div class="form-group">
+                        <label>العمر</label>
+                        <input type="number" id="age" placeholder="اكتب عمرك هنا" min="1" max="100" required>
+                        <p class="error-message" id="ageError">الرجاء ادخال العمر</p>
+                    </div>
+                    <div class="form-group">
+                        <label>يوزر روبلوكس</label>
+                        <input type="text" id="roblox" placeholder="اكتب يوزر روبلوكس هنا" required>
+                        <p class="error-message" id="robloxError">الرجاء ادخال يوزر روبلوكس</p>
+                    </div>
+                    <div class="form-group">
+                        <label>يوزر تيك توك</label>
+                        <input type="text" id="tiktok" placeholder="اكتب يوزر تيك توك هنا" required>
+                        <p class="error-message" id="tiktokError">الرجاء ادخال يوزر تيك توك</p>
+                    </div>
+                    <button type="submit" class="submit-btn" id="submitBtn">ارسال الطلب</button>
+                </form>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>جاري الارسال...</p>
+            </div>
+
+            <div class="success-message" id="successMessage">
+                <div class="success-icon">-</div>
+                <h2>تم رفع طلبك</h2>
+                <p>انتظر الرد على حسابك تيك توك</p>
+                <button class="back-btn" onclick="goBack()">رجوع</button>
+            </div>
+
+            <div class="already-submitted" id="alreadySubmitted">
+                <div class="already-icon">!</div>
+                <h2>تم التقديم من قبل</h2>
+                <p>لا يمكنك التقديم مره ثانيه</p>
+                <button class="back-btn" onclick="goBackFromSubmitted()">رجوع</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const WEBHOOK_URL = 'https://discord.com/api/webhooks/1494398818974830733/xlNrZiykm0dtQSyslo3jXHYREsiHCRAiyFvlIOS6gbda0plLhwPT_9ZzbwLzqZBFDw08';
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        const cubeGeometry = new THREE.BoxGeometry(5, 5, 5);
+        const cubeMaterial = new THREE.MeshBasicMaterial({ 
+            color: 0x1b3a5f,
+            wireframe: false
+        });
+        const wireframeMaterial = new THREE.MeshBasicMaterial({ 
+            color: 0x2d5a87,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.4
+        });
+        const wireframeGeometry = new THREE.BoxGeometry(5.1, 5.1, 5.1);
+        const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+        const wireframe = new THREE.Mesh(wireframeGeometry, wireframeMaterial);
+        const cubeGroup = new THREE.Group();
+        cubeGroup.add(cube);
+        cubeGroup.add(wireframe);
+        cubeGroup.rotation.x = 0.3;
+        cubeGroup.rotation.y = 0.5;
+        scene.add(cubeGroup);
+
+        const cube2 = new THREE.Mesh(
+            new THREE.BoxGeometry(3, 3, 3),
+            new THREE.MeshBasicMaterial({ color: 0x2d5a87, wireframe: true, transparent: true, opacity: 0.5 })
+        );
+        cube2.position.set(4, 3, 2);
+        scene.add(cube2);
+
+        const cube3 = new THREE.Mesh(
+            new THREE.BoxGeometry(2, 2, 2),
+            new THREE.MeshBasicMaterial({ color: 0x4a7fb0, wireframe: true, transparent: true, opacity: 0.4 })
+        );
+        cube3.position.set(-4, -2, 3);
+        scene.add(cube3);
+
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 2000;
+        const posArray = new Float32Array(particlesCount * 3);
+
+        for(let i = 0; i < particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 50;
+        }
+
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.05,
+            color: 0x2d5a87,
+            transparent: true,
+            opacity: 0.8
+        });
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+
+        camera.position.z = 15;
+
+        let mouseX = 0;
+        let mouseY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX - window.innerWidth / 2) * 0.001;
+            mouseY = (e.clientY - window.innerHeight / 2) * 0.001;
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            cubeGroup.rotation.y += 0.005;
+            cube2.rotation.x += 0.003;
+            cube2.rotation.y += 0.003;
+            cube3.rotation.x -= 0.002;
+            cube3.rotation.z += 0.003;
+
+            particlesMesh.rotation.y += 0.0005;
+
+            camera.position.x += (mouseX - camera.position.x) * 0.05;
+            camera.position.y += (-mouseY - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        function showForm() {
+            const landing = document.getElementById('landing');
+            const formContainer = document.getElementById('formContainer');
+            const formBox = document.getElementById('formBox');
+            const formContent = document.getElementById('formContent');
+            const successMessage = document.getElementById('successMessage');
+            const alreadySubmitted = document.getElementById('alreadySubmitted');
+            
+            gsap.to(landing, {
+                opacity: 0,
+                duration: 0.5,
+                onComplete: () => {
+                    landing.classList.add('hidden');
+                    formContainer.classList.add('active');
+                    gsap.from(formContainer, { opacity: 0, duration: 0.5 });
+                    
+                    formContent.style.display = 'none';
+                    successMessage.classList.remove('active');
+                    successMessage.classList.remove('active');
+                    alreadySubmitted.classList.remove('active');
+                    
+                    if (localStorage.getItem('plusProductionSubmitted')) {
+                        alreadySubmitted.classList.add('active');
+                    } else {
+                        formContent.style.display = 'block';
+                    }
+                    
+                    gsap.from(formBox, {
+                        scale: 0.8,
+                        opacity: 0,
+                        duration: 0.5,
+                        delay: 0.2,
+                        ease: 'back.out(1.7)'
+                    });
+                }
+            });
+        }
+
+        function goBackFromSubmitted() {
+            const landing = document.getElementById('landing');
+            const formContainer = document.getElementById('formContainer');
+            const alreadySubmitted = document.getElementById('alreadySubmitted');
+            
+            alreadySubmitted.classList.remove('active');
+            
+            gsap.to(formContainer, {
+                opacity: 0,
+                duration: 0.3,
+                onComplete: () => {
+                    formContainer.classList.remove('active');
+                    landing.classList.remove('hidden');
+                    gsap.to(landing, { opacity: 1, duration: 0.5 });
+                }
+            });
+        }
+
+        function goBack() {
+            const landing = document.getElementById('landing');
+            const formContainer = document.getElementById('formContainer');
+            const form = document.getElementById('applicationForm');
+            const formContent = document.getElementById('formContent');
+            const successMessage = document.getElementById('successMessage');
+            const loading = document.getElementById('loading');
+
+            loading.classList.remove('active');
+            successMessage.classList.remove('active');
+            formContent.style.display = 'block';
+            
+            gsap.to(formContainer, {
+                opacity: 0,
+                duration: 0.3,
+                onComplete: () => {
+                    formContainer.classList.remove('active');
+                    landing.classList.remove('hidden');
+                    gsap.to(landing, { opacity: 1, duration: 0.5 });
+                    
+                    document.getElementById('name').value = '';
+                    document.getElementById('age').value = '';
+                    document.getElementById('roblox').value = '';
+                    document.getElementById('tiktok').value = '';
+                }
+            });
+        }
+
+        document.getElementById('applicationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value.trim();
+            const age = document.getElementById('age').value.trim();
+            const roblox = document.getElementById('roblox').value.trim();
+            const tiktok = document.getElementById('tiktok').value.trim();
+
+            let isValid = true;
+
+            document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
+
+            if (!name) {
+                document.getElementById('nameError').style.display = 'block';
+                isValid = false;
+            }
+            if (!age) {
+                document.getElementById('ageError').style.display = 'block';
+                isValid = false;
+            }
+            if (!roblox) {
+                document.getElementById('robloxError').style.display = 'block';
+                isValid = false;
+            }
+            if (!tiktok) {
+                document.getElementById('tiktokError').style.display = 'block';
+                isValid = false;
+            }
+
+            if (!isValid) {
+                document.getElementById('formBox').classList.add('shake');
+                setTimeout(() => {
+                    document.getElementById('formBox').classList.remove('shake');
+                }, 500);
+                return;
+            }
+
+            const form = document.getElementById('applicationForm');
+            const loading = document.getElementById('loading');
+            const submitBtn = document.getElementById('submitBtn');
+
+            form.style.display = 'none';
+            loading.classList.add('active');
+
+            const embed = {
+                title: 'طلب تقديم جديد - مسرحية صنع في زين',
+                color: 0x1b3a5f,
+                fields: [
+                    { name: 'الاسم', value: name, inline: false },
+                    { name: 'العمر', value: age, inline: false },
+                    { name: 'يوزر روبلوكس', value: roblox, inline: false },
+                    { name: 'يوزر تيك توك', value: tiktok, inline: false }
+                ],
+                description: 'تم استلام طلب التقديم بنجاح',
+                footer: {
+                    text: 'Plus Stage | Plus Production'
+                },
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ embeds: [embed] })
+                });
+
+                loading.classList.remove('active');
+                
+                if (response.ok) {
+                    localStorage.setItem('plusProductionSubmitted', 'true');
+                    document.getElementById('formContent').style.display = 'none';
+                    document.getElementById('successMessage').classList.add('active');
+                    gsap.from('#successMessage', { scale: 0.5, opacity: 0, duration: 0.5, ease: 'back.out(1.7)' });
+                } else {
+                    throw new Error('Failed to send');
+                }
+            } catch (error) {
+                loading.classList.remove('active');
+                form.style.display = 'block';
+                alert('حدث خطأ اثناء الارسال، يرجى المحاولة مرة اخرى');
+            }
+        });
+
+        document.querySelectorAll('.form-group input').forEach(input => {
+            input.addEventListener('input', function() {
+                this.style.borderColor = 'rgba(45, 90, 135, 0.4)';
+            });
+        });
+    </script>
+</body>
+</html>
